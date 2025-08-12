@@ -32,9 +32,9 @@ async function bootstrap() {
   const seederService = app.get(SeederService);
   await seederService.seed();
 
-  await app.listen(3000);
-  console.log('Application is running on: http://localhost:3000');
-  console.log('Swagger documentation is available at: http://localhost:3000/api');
+  await app.listen(3002);
+  console.log('Application is running on: http://localhost:3002');
+  console.log('Swagger documentation is available at: http://localhost:3002/api');
 }
 
 bootstrap();
