@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { CrudServiceStructure, CrudServiceFrom } from '@solid-nestjs/typeorm';
 import { Product } from '../entities/product.entity';
 import { CreateProductDto } from '../dtos/create-product.dto';
@@ -18,11 +16,4 @@ const serviceStructure = CrudServiceStructure({
 });
 
 @Injectable()
-export class ProductService extends CrudServiceFrom(serviceStructure) {
-  constructor(
-    @InjectRepository(Product)
-    repository: Repository<Product>,
-  ) {
-    super(repository);
-  }
-}
+export class ProductService extends CrudServiceFrom(serviceStructure) {}

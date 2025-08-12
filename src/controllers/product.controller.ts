@@ -23,8 +23,4 @@ const controllerStructure = CrudControllerStructure({
 });
 
 @Controller('products')
-export class ProductController extends CrudControllerFrom(controllerStructure) {
-  constructor(productService: ProductService) {
-    super(productService);
-  }
-}
+export class ProductController extends CrudControllerFrom(controllerStructure) {}
