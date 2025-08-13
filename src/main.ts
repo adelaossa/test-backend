@@ -1,4 +1,7 @@
 import 'reflect-metadata';
+import { config } from 'dotenv';
+config();
+
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -34,9 +37,11 @@ async function bootstrap() {
   const seederService = app.get(SeederService);
   await seederService.seed();
 
-  await app.listen(3002);
-  console.log('Application is running on: http://localhost:3002');
-  console.log('Swagger documentation is available at: http://localhost:3002/api');
+  const port = process.env.PORT || 3002;
+  await app.listen(port);
+  console.log(`Application is running on: http://localhost:${port}`);
+  console.log(`Swagger documentation is available at: http://localhost:${port}/api`);
+  console.log(`GraphQL endpoint is available at: http://localhost:${port}/graphql`);
 }
 
 bootstrap();
