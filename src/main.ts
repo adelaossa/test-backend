@@ -18,11 +18,13 @@ async function bootstrap() {
 
   // Configuración de Swagger
   const config = new DocumentBuilder()
-    .setTitle('Products and Suppliers API')
-    .setDescription('API para gestión de productos y proveedores')
+    .setTitle('Business Management API')
+    .setDescription('API para gestión de productos, proveedores, clientes y facturas')
     .setVersion('1.0')
     .addTag('products', 'Operaciones CRUD para productos')
     .addTag('suppliers', 'Operaciones CRUD para proveedores')
+    .addTag('customers', 'Operaciones CRUD para clientes')
+    .addTag('invoices', 'Operaciones CRUD para facturas')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

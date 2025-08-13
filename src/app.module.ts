@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { databaseConfig } from './database.config';
 import { ProductModule } from './modules/product.module';
 import { SupplierModule } from './modules/supplier.module';
+import { CustomerModule } from './modules/customer.module';
+import { InvoiceModule } from './modules/invoice.module';
 import { SeederModule } from './modules/seeder.module';
 
 @Module({
@@ -10,6 +12,8 @@ import { SeederModule } from './modules/seeder.module';
     TypeOrmModule.forRoot(databaseConfig),
     ProductModule,
     SupplierModule,
+    CustomerModule,
+    InvoiceModule,
     SeederModule,
   ],
 })

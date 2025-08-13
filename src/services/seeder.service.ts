@@ -3,6 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Supplier } from '../entities/supplier.entity';
 import { Product } from '../entities/product.entity';
+import { Customer } from '../entities/customer.entity';
+import { Invoice } from '../entities/invoice.entity';
+import { InvoiceItem } from '../entities/invoice-item.entity';
+import { InvoiceStatus } from '../entities/invoice.entity';
 
 @Injectable()
 export class SeederService {
@@ -13,6 +17,12 @@ export class SeederService {
     private supplierRepository: Repository<Supplier>,
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    @InjectRepository(Customer)
+    private customerRepository: Repository<Customer>,
+    @InjectRepository(Invoice)
+    private invoiceRepository: Repository<Invoice>,
+    @InjectRepository(InvoiceItem)
+    private invoiceItemRepository: Repository<InvoiceItem>,
   ) {}
 
   async seed(): Promise<void> {
@@ -20,8 +30,10 @@ export class SeederService {
       // Check if data already exists
       const supplierCount = await this.supplierRepository.count();
       const productCount = await this.productRepository.count();
+      const customerCount = await this.customerRepository.count();
+      const invoiceCount = await this.invoiceRepository.count();
 
-      if (supplierCount > 0 || productCount > 0) {
+      if (supplierCount > 0 || productCount > 0 || customerCount > 0 || invoiceCount > 0) {
         this.logger.log('Database already contains data, skipping seeding');
         return;
       }
@@ -35,6 +47,14 @@ export class SeederService {
       // Create products
       const products = await this.createProducts(suppliers);
       this.logger.log(`Created ${products.length} products`);
+
+      // Create customers
+      const customers = await this.createCustomers();
+      this.logger.log(`Created ${customers.length} customers`);
+
+      // Create invoices with items
+      const invoices = await this.createInvoices(customers, products);
+      this.logger.log(`Created ${invoices.length} invoices`);
 
       this.logger.log('Database seeding completed successfully');
     } catch (error) {
@@ -205,4 +225,225 @@ export class SeederService {
     const products = this.productRepository.create(productsData);
     return await this.productRepository.save(products);
   }
+
+  private async createCustomers(): Promise<Customer[]> {
+    const customersData = [
+      {
+        name: 'Acme Corporation',
+        email: 'contact@acmecorp.com',
+        phone: '+1-555-111-2222',
+        address: '123 Business Ave, Corporate City, NY 10001',
+        taxId: 'TAX123456789',
+        isActive: true,
+      },
+      {
+        name: 'Global Enterprises Ltd.',
+        email: 'info@globalenterprises.com',
+        phone: '+1-555-333-4444',
+        address: '456 Commerce St, Trade Town, CA 90210',
+        taxId: 'TAX987654321',
+        isActive: true,
+      },
+      {
+        name: 'TechStart Solutions',
+        email: 'hello@techstart.com',
+        phone: '+1-555-555-6666',
+        address: '789 Innovation Blvd, Silicon Valley, CA 94000',
+        taxId: 'TAX456789123',
+        isActive: true,
+      },
+      {
+        name: 'Manufacturing Plus Inc.',
+        email: 'orders@manufacturingplus.com',
+        phone: '+1-555-777-8888',
+        address: '321 Industrial Park, Factory City, TX 75001',
+        taxId: 'TAX789123456',
+        isActive: true,
+      },
+      {
+        name: 'Retail Chain Store',
+        email: 'purchasing@retailchain.com',
+        phone: '+1-555-999-0000',
+        address: '654 Shopping Mall, Retail City, FL 33101',
+        taxId: 'TAX321654987',
+        isActive: true,
+      },
+    ];
+
+    const customers = this.customerRepository.create(customersData);
+    return await this.customerRepository.save(customers);
+  }
+
+  private async createInvoices(customers: Customer[], products: Product[]): Promise<Invoice[]> {
+    const invoicesData = [];
+    const currentDate = new Date();
+
+    // Invoice 1 - Acme Corporation
+    invoicesData.push({
+      invoiceNumber: 'INV-2024-001',
+      invoiceDate: new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 15),
+      dueDate: new Date(currentDate.getFullYear(), currentDate.getMonth(), 15),
+      status: InvoiceStatus.PAID,
+      notes: 'Pago realizado mediante transferencia bancaria',
+      customerId: customers[0].id,
+      customer: customers[0],
+      isActive: true,
+      items: [
+        {
+          quantity: 5,
+          unitPrice: products[0].price,
+          totalPrice: 5 * products[0].price,
+          productId: products[0].id,
+          product: products[0],
+          isActive: true,
+        },
+        {
+          quantity: 3,
+          unitPrice: products[1].price,
+          totalPrice: 3 * products[1].price,
+          productId: products[1].id,
+          product: products[1],
+          isActive: true,
+        }
+      ]
+    });
+
+    // Invoice 2 - Global Enterprises Ltd.
+    invoicesData.push({
+      invoiceNumber: 'INV-2024-002',
+      invoiceDate: new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 28),
+      dueDate: new Date(currentDate.getFullYear(), currentDate.getMonth(), 28),
+      status: InvoiceStatus.PENDING,
+      notes: 'Factura pendiente de pago - recordatorio enviado',
+      customerId: customers[1].id,
+      customer: customers[1],
+      isActive: true,
+      items: [
+        {
+          quantity: 10,
+          unitPrice: products[3].price,
+          totalPrice: 10 * products[3].price,
+          productId: products[3].id,
+          product: products[3],
+          isActive: true,
+        },
+        {
+          quantity: 15,
+          unitPrice: products[5].price,
+          totalPrice: 15 * products[5].price,
+          productId: products[5].id,
+          product: products[5],
+          isActive: true,
+        }
+      ]
+    });
+
+    // Invoice 3 - TechStart Solutions
+    invoicesData.push({
+      invoiceNumber: 'INV-2024-003',
+      invoiceDate: new Date(currentDate.getFullYear(), currentDate.getMonth(), 5),
+      dueDate: new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 5),
+      status: InvoiceStatus.DRAFT,
+      notes: 'Borrador - pendiente de aprobación del cliente',
+      customerId: customers[2].id,
+      customer: customers[2],
+      isActive: true,
+      items: [
+        {
+          quantity: 20,
+          unitPrice: products[2].price,
+          totalPrice: 20 * products[2].price,
+          productId: products[2].id,
+          product: products[2],
+          isActive: true,
+        },
+        {
+          quantity: 8,
+          unitPrice: products[6].price,
+          totalPrice: 8 * products[6].price,
+          productId: products[6].id,
+          product: products[6],
+          isActive: true,
+        }
+      ]
+    });
+
+    // Invoice 4 - Manufacturing Plus Inc.
+    invoicesData.push({
+      invoiceNumber: 'INV-2024-004',
+      invoiceDate: new Date(currentDate.getFullYear(), currentDate.getMonth(), 10),
+      dueDate: new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 10),
+      status: InvoiceStatus.PAID,
+      notes: 'Pago recibido por cheque - orden completada',
+      customerId: customers[3].id,
+      customer: customers[3],
+      isActive: true,
+      items: [
+        {
+          quantity: 2,
+          unitPrice: products[9].price,
+          totalPrice: 2 * products[9].price,
+          productId: products[9].id,
+          product: products[9],
+          isActive: true,
+        },
+        {
+          quantity: 1,
+          unitPrice: products[10].price,
+          totalPrice: 1 * products[10].price,
+          productId: products[10].id,
+          product: products[10],
+          isActive: true,
+        }
+      ]
+    });
+
+    // Invoice 5 - Retail Chain Store
+    invoicesData.push({
+      invoiceNumber: 'INV-2024-005',
+      invoiceDate: new Date(currentDate.getFullYear(), currentDate.getMonth(), 20),
+      dueDate: new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 20),
+      status: InvoiceStatus.PENDING,
+      notes: 'Orden urgente - entrega programada',
+      customerId: customers[4].id,
+      customer: customers[4],
+      isActive: true,
+      items: [
+        {
+          quantity: 12,
+          unitPrice: products[4].price,
+          totalPrice: 12 * products[4].price,
+          productId: products[4].id,
+          product: products[4],
+          isActive: true,
+        },
+        {
+          quantity: 6,
+          unitPrice: products[8].price,
+          totalPrice: 6 * products[8].price,
+          productId: products[8].id,
+          product: products[8],
+          isActive: true,
+        }
+      ]
+    });
+
+    // Calculate totals for each invoice
+    for (const invoiceData of invoicesData) {
+      const subtotal = invoiceData.items.reduce((sum, item) => sum + item.totalPrice, 0);
+      const taxRate = 0.10; // 10% tax
+      const taxAmount = subtotal * taxRate;
+      const total = subtotal + taxAmount;
+
+      invoiceData.subtotal = subtotal;
+      invoiceData.taxAmount = taxAmount;
+      invoiceData.total = total;
+    }
+
+    const invoices = this.invoiceRepository.create(invoicesData);
+    const savedInvoices = await this.invoiceRepository.save(invoices);
+
+    return savedInvoices;
+  }
+
 }
