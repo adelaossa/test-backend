@@ -42,11 +42,11 @@ export class Product {
   @JoinColumn({ name: 'supplierId' })
   supplier: Supplier;
 
-  @Field()
+  @Field(() => Date)
   @CreateDateColumn()
   createdAt: Date;
 
-  @Field()
+  @Field(() => Date)
   @UpdateDateColumn()
   updatedAt: Date;
 }

@@ -37,11 +37,11 @@ export class Supplier {
   @OneToMany(() => Product, (product) => product.supplier)
   products: Product[];
 
-  @Field()
+  @Field(() => Date)
   @CreateDateColumn()
   createdAt: Date;
 
-  @Field()
+  @Field(() => Date)
   @UpdateDateColumn()
   updatedAt: Date;
 }

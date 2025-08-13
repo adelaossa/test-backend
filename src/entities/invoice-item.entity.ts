@@ -48,11 +48,11 @@ export class InvoiceItem {
   @JoinColumn({ name: 'productId' })
   product: Product;
 
-  @Field()
+  @Field(() => Date)
   @CreateDateColumn()
   createdAt: Date;
 
-  @Field()
+  @Field(() => Date)
   @UpdateDateColumn()
   updatedAt: Date;
 }

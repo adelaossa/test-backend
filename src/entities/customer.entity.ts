@@ -37,11 +37,11 @@ export class Customer {
   @OneToMany(() => Invoice, (invoice) => invoice.customer)
   invoices: Invoice[];
 
-  @Field()
+  @Field(() => Date)
   @CreateDateColumn()
   createdAt: Date;
 
-  @Field()
+  @Field(() => Date)
   @UpdateDateColumn()
   updatedAt: Date;
 }

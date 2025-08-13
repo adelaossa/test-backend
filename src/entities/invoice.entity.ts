@@ -25,12 +25,12 @@ export class Invoice {
   @Column({ unique: true, length: 50 })
   invoiceNumber: string;
 
-  @Field()
-  @Column({ type: 'date' })
+  @Field(() => Date)
+  @Column({ type: 'datetime' })
   invoiceDate: Date;
 
-  @Field({ nullable: true })
-  @Column({ type: 'date', nullable: true })
+  @Field(() => Date, { nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   dueDate?: Date;
 
   @Field(() => InvoiceStatus)
@@ -73,11 +73,11 @@ export class Invoice {
   @OneToMany(() => InvoiceItem, (item) => item.invoice, { cascade: true })
   items: InvoiceItem[];
 
-  @Field()
+  @Field(() => Date)
   @CreateDateColumn()
   createdAt: Date;
 
-  @Field()
+  @Field(() => Date)
   @UpdateDateColumn()
   updatedAt: Date;
 }
